@@ -10,7 +10,7 @@ import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 contract EpochRewardsVault is Ownable{
 
   /// @notice Structure to track user rewards for each epoch
-  /// @param poolPercentage User's percentage of the reward pool (0-100.000)
+  /// @param poolPercentage User's percentage of the reward pool (0-100.0000)
   /// @param claimed Whether the user has claimed their reward for this epoch
   struct UserEpochPoolReward {
     uint256 poolPercentage; // 0 - 100.0000 (7 digit number, last 4 numbers are for decimal values)
