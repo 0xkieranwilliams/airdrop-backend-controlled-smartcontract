@@ -65,7 +65,7 @@ contract EpochRewardsVault is Ownable{
   /// @param user Address of the user to receive rewards
   /// @param poolPercentage Percentage of the pool allocated to the user
   function addUserToEpochRewards(address user, uint256 poolPercentage) public onlyOwner{
-    require(!s_userEpochRewards[s_currentEpoch][user].claimed, "");
+    require(!s_userEpochRewards[s_currentEpoch][user].claimed, "Can't add user after they have already been added and already claimed");
     s_userEpochRewards[s_currentEpoch][user] = UserEpochPoolReward({poolPercentage: poolPercentage, claimed: false});
     emit UserAddedToEpochRewards(s_currentEpoch, user, poolPercentage);
   }
