@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
 /// @title EpochRewardsVault
-/// @author Original contract author
+/// @author Kieran Williams
 /// @notice Manages epoch-based rewards distribution with percentage-based allocation
 /// @dev Inherits OpenZeppelin's Ownable for access control
 contract EpochRewardsVault is Ownable{
