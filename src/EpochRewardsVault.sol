@@ -24,7 +24,7 @@ contract EpochRewardsVault is Ownable{
   /// @notice Current epoch number
   uint256 public s_currentEpoch = 0;
 
-  /// @notice Maximum allowed pool percentage per user (5.000%)
+  /// @notice Maximum allowed pool percentage per user (5.0000%)
   uint256 public s_maxUserPoolPercentage = 50000;
 
   /// @notice Maps epoch and user address to their reward information
