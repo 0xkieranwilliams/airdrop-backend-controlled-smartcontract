@@ -28,7 +28,7 @@ contract EpochRewardsVault is Ownable{
   uint256 public s_maxUserPoolPercentage = 5000;
 
   /// @notice Maps epoch and user address to their reward information
-  mapping(uint256 epoch => mapping(address userAddr => UserEpochPoolReward)) s_userEpochRewards;
+  mapping(uint256 epoch => mapping(address user => UserEpochPoolReward)) s_userEpochRewards;
 
   /// @notice Total points allocated in each epoch
   mapping(uint256 epoch => uint256 totalPoints) s_totalPointsInEpoch;
