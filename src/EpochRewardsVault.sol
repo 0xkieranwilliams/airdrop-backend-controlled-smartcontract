@@ -13,7 +13,7 @@ contract EpochRewardsVault is Ownable{
   /// @param poolPercentage User's percentage of the reward pool (0-100.000)
   /// @param claimed Whether the user has claimed their reward for this epoch
   struct UserEpochPoolReward {
-    uint256 poolPercentage; // 0 - 100.000 (6 digit number, last 3 numbers are for decimal values)
+    uint256 poolPercentage; // 0 - 100.0000 (7 digit number, last 4 numbers are for decimal values)
     bool claimed;
   }
 
@@ -25,7 +25,7 @@ contract EpochRewardsVault is Ownable{
   uint256 public s_currentEpoch = 0;
 
   /// @notice Maximum allowed pool percentage per user (5.000%)
-  uint256 public s_maxUserPoolPercentage = 5000;
+  uint256 public s_maxUserPoolPercentage = 50000;
 
   /// @notice Maps epoch and user address to their reward information
   mapping(uint256 epoch => mapping(address user => UserEpochPoolReward)) s_userEpochRewards;
@@ -62,12 +62,12 @@ contract EpochRewardsVault is Ownable{
   }
 
   /// @notice Adds or updates a user's reward allocation for a specific epoch
-  /// @param epoch The epoch number to add rewards for
-  /// @param userAddr Address of the user to receive rewards
+  /// @param user Address of the user to receive rewards
   /// @param poolPercentage Percentage of the pool allocated to the user
-  function addUserToEpochRewards(uint256 epoch, address userAddr, uint256 poolPercentage) public onlyOwner{
-    s_userEpochRewards[epoch][userAddr] = UserEpochPoolReward({poolPercentage: poolPercentage, claimed: false});
-    emit UserAddedToEpochRewards(epoch, userAddr, poolPercentage);
+  function addUserToEpochRewards(address user, uint256 poolPercentage) public onlyOwner{
+    require(!s_userEpochRewards[s_currentEpoch][user].claimed, "");
+    s_userEpochRewards[s_currentEpoch][user] = UserEpochPoolReward({poolPercentage: poolPercentage, claimed: false});
+    emit UserAddedToEpochRewards(s_currentEpoch, user, poolPercentage);
   }
 
   /// @notice Updates the maximum allowed pool percentage per user
@@ -99,7 +99,7 @@ contract EpochRewardsVault is Ownable{
       uint256 rewardAmount = (totalBalance * userEpochPoolReward.poolPercentage) / 1000000; // Pool percentage is stored as a 6-digit number with decimals
 
       // Ensure that there is enough balance to cover the reward
-      require(totalBalance >= rewardAmount, "Insufficient contract balance to claim reward");
+      require(getRewardVaultCurrentBalance() >= rewardAmount, "Insufficient contract balance to claim reward");
 
       // Update the claimed status
       userEpochPoolReward.claimed = true;
@@ -173,7 +173,7 @@ contract EpochRewardsVault is Ownable{
           s_maxUserPoolPercentage : reward.poolPercentage;
       uint256 rewardAmount = (s_epochDistributingBalance[s_currentEpoch] * adjustedPercentage) / 1000000;
       
-      if (s_epochDistributingBalance[s_currentEpoch] < rewardAmount) {
+      if (getRewardVaultCurrentBalance() < rewardAmount) {
           return (false, "Insufficient contract balance");
       }
       
