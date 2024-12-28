@@ -54,13 +54,13 @@ contract EpochRewardsVaultTest is Test {
 
     /// @dev Test adding user to epoch rewards
     function test_AddUserToEpochRewards() public {
-        uint256 epoch = 1;
-        uint256 poolPercentage = 2500; // 2.5%
+        uint256 epoch = 0;
+        uint256 poolPercentage = 25000; // 2.5%
         
         vm.startPrank(owner);
         vm.expectEmit(true, true, false, true);
         emit UserAddedToEpochRewards(epoch, alice, poolPercentage);
-        vault.addUserToEpochRewards(epoch, alice, poolPercentage);
+        vault.addUserToEpochRewards(alice, poolPercentage);
         vm.stopPrank();
 
         (uint256 userPoolPercentage, bool claimed, bool isEligible,) = vault.getUserEpochReward(epoch, alice);
@@ -71,7 +71,7 @@ contract EpochRewardsVaultTest is Test {
 
     /// @dev Test updating max user pool percentage
     function test_UpdateMaxUserPoolPercentage() public {
-        uint256 newMaxPercentage = 3000; // 3%
+        uint256 newMaxPercentage = 30000; // 3%
         
         vm.startPrank(owner);
         vm.expectEmit(true, true, false, true);
@@ -95,7 +95,7 @@ contract EpochRewardsVaultTest is Test {
         
         // Add user to rewards
         vm.prank(owner);
-        vault.addUserToEpochRewards(1, alice, poolPercentage);
+        vault.addUserToEpochRewards(alice, poolPercentage);
         
         // Calculate expected reward
         uint256 expectedReward = (fundAmount * poolPercentage) / 1000000; // Adjusted for 6 decimal places
@@ -118,7 +118,7 @@ contract EpochRewardsVaultTest is Test {
         
         vm.startPrank(owner);
         vault.updateEpoch{value: fundAmount}(1000);
-        vault.addUserToEpochRewards(1, alice, poolPercentage);
+        vault.addUserToEpochRewards(alice, poolPercentage);
         vm.stopPrank();
         
         uint256 maxPercentage = vault.s_maxUserPoolPercentage();
@@ -146,7 +146,7 @@ contract EpochRewardsVaultTest is Test {
         
         vm.startPrank(owner);
         vault.updateEpoch{value: fundAmount}(1000);
-        vault.addUserToEpochRewards(1, alice, poolPercentage);
+        vault.addUserToEpochRewards(alice, poolPercentage);
         vm.stopPrank();
         
         vm.startPrank(alice);
@@ -164,7 +164,7 @@ contract EpochRewardsVaultTest is Test {
         
         vm.startPrank(owner);
         vault.updateEpoch{value: fundAmount}(1000);
-        vault.addUserToEpochRewards(1, alice, poolPercentage);
+        vault.addUserToEpochRewards(alice, poolPercentage);
         vm.stopPrank();
         
         (
@@ -202,7 +202,7 @@ contract EpochRewardsVaultTest is Test {
         
         vm.startPrank(owner);
         vault.updateEpoch{value: fundAmount}(1000);
-        vault.addUserToEpochRewards(1, alice, poolPercentage);
+        vault.addUserToEpochRewards(alice, poolPercentage);
         vm.stopPrank();
         
         (bool canClaim, string memory reason) = vault.canUserClaim(alice);
@@ -226,7 +226,7 @@ contract EpochRewardsVaultTest is Test {
         vault.updateEpoch(1000);
         
         vm.expectRevert();
-        vault.addUserToEpochRewards(1, alice, 2500);
+        vault.addUserToEpochRewards(alice, 2500);
         
         vm.expectRevert();
         vault.updateMaxUserPoolPercentage(3000);
@@ -236,7 +236,6 @@ contract EpochRewardsVaultTest is Test {
 
     /// @dev Fuzz test for addUserToEpochRewards
     function testFuzz_AddUserToEpochRewards(
-        uint256 epoch,
         address user,
         uint256 percentage
     ) public {
@@ -244,9 +243,9 @@ contract EpochRewardsVaultTest is Test {
         vm.assume(percentage > 0 && percentage <= 100000);
         
         vm.prank(owner);
-        vault.addUserToEpochRewards(epoch, user, percentage);
+        vault.addUserToEpochRewards(user, percentage);
         
-        (uint256 userPoolPercentage,,bool isEligible,) = vault.getUserEpochReward(epoch, user);
+        (uint256 userPoolPercentage,,bool isEligible,) = vault.getUserEpochReward(0, user);
         assertEq(userPoolPercentage, percentage);
         assertTrue(isEligible);
     }
@@ -294,7 +293,7 @@ contract EpochRewardsVaultTest is Test {
         
         // Add all users to the epoch
         for(uint i = 0; i < users.length; i++) {
-            vault.addUserToEpochRewards(1, users[i], percentages[i]);
+            vault.addUserToEpochRewards(users[i], percentages[i]);
             
             // Verify user was added correctly
             (uint256 poolPercentage, bool claimed, bool isEligible, uint256 calculatedReward) = 
@@ -374,7 +373,7 @@ contract EpochRewardsVaultTest is Test {
         // Create and register all users
         for(uint i = 0; i < numUsers; i++) {
             users[i] = makeAddr(string.concat("user", vm.toString(i)));
-            vault.addUserToEpochRewards(1, users[i], percentage);
+            vault.addUserToEpochRewards(users[i], percentage);
         }
         vm.stopPrank();
 
@@ -462,7 +461,7 @@ contract EpochRewardsVaultTest is Test {
         // Register all users
         for(uint i = 0; i < testCases.length; i++) {
             TestCase memory tc = testCases[i];
-            vault.addUserToEpochRewards(1, tc.user, tc.percentage);
+            vault.addUserToEpochRewards(tc.user, tc.percentage);
         }
         vm.stopPrank();
 
