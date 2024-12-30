@@ -52,6 +52,10 @@ contract EpochRewardsVault is Ownable{
   /// @param poolPercentage Allocated pool percentage for the user
   event UserAddedToEpochRewards(uint256 indexed epoch, address indexed user, uint256 poolPercentage);
 
+  /// @notice Emitted when the epoch is incremented
+  /// @param epoch The epoch number
+  event EpochUpdated(uint256 indexed epoch);
+
   /// @notice Updates the epoch number and sets new distribution parameters
   /// @param totalPointsInEpoch Total points to be considered for the new epoch
   /// @dev Increments current epoch and stores the total points and current balance
@@ -59,6 +63,7 @@ contract EpochRewardsVault is Ownable{
     s_currentEpoch = s_currentEpoch + 1;
     s_totalPointsInEpoch[s_currentEpoch] = totalPointsInEpoch;
     s_epochDistributingBalance[s_currentEpoch] = getRewardVaultCurrentBalance();
+    emit EpochUpdated(s_currentEpoch);
   }
 
   /// @notice Adds or updates a user's reward allocation for a specific epoch
